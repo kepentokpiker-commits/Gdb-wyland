@@ -4,6 +4,7 @@
         android:label="MyApp"
         android:theme="@android:style/Theme.Material.Light">
         <activity
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

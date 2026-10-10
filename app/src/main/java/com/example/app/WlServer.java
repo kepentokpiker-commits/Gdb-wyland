@@ -1,5 +1,7 @@
 package com.example.app;
 
+import android.system.OsConstants;
+import android.system.UnixSocketAddress;
 import android.graphics.Bitmap;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
@@ -23,10 +25,10 @@ public class WlServer {
         new Thread(() -> {
             try {
                 new File(path).delete();
-                keep = new LocalSocket(LocalSocket.SOCKET_STREAM);
-                keep.bind(new LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM));
+                FileDescriptor sfd = Os.socket(OsConstants.AF_UNIX, OsConstants.SOCK_STREAM, 0);
+                Os.bind(sfd, UnixSocketAddress.createFileSystem(path));
                 Os.chmod(path, 0777);
-                keepSrv = new LocalServerSocket(keep.getFileDescriptor());
+                keepSrv = new LocalServerSocket(sfd);
                 final LocalServerSocket srv = keepSrv;
                 sink.log("Siap: " + path);
                 while (true) {

@@ -16,14 +16,18 @@ public class WlServer {
     final Sink sink;
     public WlServer(Sink s) { sink = s; }
 
+    LocalSocket keep;
+    LocalServerSocket keepSrv;
+
     public void start(final String path) {
         new Thread(() -> {
             try {
                 new File(path).delete();
-                LocalSocket ls = new LocalSocket(LocalSocket.SOCKET_STREAM);
-                ls.bind(new LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM));
+                keep = new LocalSocket(LocalSocket.SOCKET_STREAM);
+                keep.bind(new LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM));
                 Os.chmod(path, 0777);
-                LocalServerSocket srv = new LocalServerSocket(ls.getFileDescriptor());
+                keepSrv = new LocalServerSocket(keep.getFileDescriptor());
+                final LocalServerSocket srv = keepSrv;
                 sink.log("Siap: " + path);
                 while (true) {
                     final LocalSocket c = srv.accept();
